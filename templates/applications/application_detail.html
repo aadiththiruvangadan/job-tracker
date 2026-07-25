@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ application.job_title }}</title>
+</head>
+<body>
+    <h2>{{ application.job_title }} @ {{ application.company_name }}</h2>
+    <p><strong>Location:</strong> {{ application.location|default:"-" }}</p>
+    <p><strong>Apply Link:</strong>
+        {% if application.apply_link %}
+            <a href="{{ application.apply_link }}" target="_blank">{{ application.apply_link }}</a>
+        {% else %}-{% endif %}
+    </p>
+    <p><strong>Applied Date:</strong> {{ application.applied_date }}</p>
+    <p><strong>Status:</strong> {{ application.get_status_display }}</p>
+    <p><strong>Notes:</strong><br>{{ application.notes|default:"-"|linebreaks }}</p>
+
+    <p>
+        <a href="{% url 'application_edit' application.pk %}">Edit</a> |
+        <a href="{% url 'application_delete' application.pk %}">Delete</a> |
+        <a href="{% url 'application_list' %}">Back to list</a>
+    </p>
+</body>
+</html>
