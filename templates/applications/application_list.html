@@ -15,7 +15,21 @@
         {% endfor %}
     {% endif %}
 
-    {% if applications %}
+    <form method="GET" action="{% url 'application_list' %}">
+        <input type="text" name="q" placeholder="Search by company or job title" value="{{ query }}">
+
+        <select name="status">
+            <option value="">All Statuses</option>
+            {% for value, label in status_choices %}
+                <option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Search</button>
+        <a href="{% url 'application_list' %}">Clear</a>
+    </form>
+
+    {% if page_obj %}
     <table border="1" cellpadding="8" cellspacing="0">
         <thead>
             <tr>
@@ -28,7 +42,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for application in applications %}
+            {% for application in page_obj %}
             <tr>
                 <td>{{ application.company_name }}</td>
                 <td>{{ application.job_title }}</td>
@@ -44,6 +58,21 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <div>
+        {% if page_obj.has_previous %}
+            <a href="?q={{ query }}&status={{ status }}&page=1">First</a>
+            <a href="?q={{ query }}&status={{ status }}&page={{ page_obj.previous_page_number }}">Previous</a>
+        {% endif %}
+
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+            <a href="?q={{ query }}&status={{ status }}&page={{ page_obj.next_page_number }}">Next</a>
+            <a href="?q={{ query }}&status={{ status }}&page={{ page_obj.paginator.num_pages }}">Last</a>
+        {% endif %}
+    </div>
+
     {% else %}
         <p>No applications yet. Add your first one!</p>
     {% endif %}
