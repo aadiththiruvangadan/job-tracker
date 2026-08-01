@@ -1,17 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delete Application</title>
-</head>
-<body>
-    <h2>Delete "{{ application.job_title }} @ {{ application.company_name }}"?</h2>
-    <p>This action cannot be undone.</p>
-    <form method="POST">
-        {% csrf_token %}
-        <button type="submit">Yes, delete</button>
-        <a href="{% url 'application_detail' application.pk %}">Cancel</a>
-    </form>
-</body>
-</html>
+{% extends 'base.html' %}
+{% block title %}Delete Application{% endblock %}
+
+{% block content %}
+<h2>Delete "{{ application.job_title }} @ {{ application.company_name }}"?</h2>
+<p>This action cannot be undone.</p>
+<form method="POST">
+    {% csrf_token %}
+    <button type="submit">Yes, delete</button>
+    <a href="{% url 'application_detail' application.pk %}">Cancel</a>
+</form>
+{% endblock %}
