@@ -3,13 +3,38 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Application
 from .forms import ApplicationForm
+from django.db.models import Q
+from django.core.paginator import Paginator
 
 
 @login_required
 def application_list(request):
     applications = Application.objects.filter(user=request.user)
-    return render(request, 'applications/application_list.html', {'applications': applications})
 
+    # Search by company or job title
+    query = request.GET.get('q', '')
+    if query:
+        applications = applications.filter(
+            Q(company_name__icontains=query) | Q(job_title__icontains=query)
+        )
+
+    # Filter by status
+    status = request.GET.get('status', '')
+    if status:
+        applications = applications.filter(status=status)
+
+    # Pagination
+    paginator = Paginator(applications, 5)  # 5 per page, adjust as you like
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'page_obj': page_obj,
+        'query': query,
+        'status': status,
+        'status_choices': Application.STATUS_CHOICES,
+    }
+    return render(request, 'applications/application_list.html', context)
 
 @login_required
 def application_detail(request, pk):
