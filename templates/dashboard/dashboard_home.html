@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h2>Dashboard</h2>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <h3>{{ total }}</h3>
+        <p>Total Applications</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ applied }}</h3>
+        <p>Applied</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ interview }}</h3>
+        <p>Interview</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ rejected }}</h3>
+        <p>Rejected</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ accepted }}</h3>
+        <p>Accepted</p>
+    </div>
+</div>
+
+<h3>Status Breakdown</h3>
+<div style="max-width: 400px;">
+    <canvas id="statusChart"></canvas>
+</div>
+
+<h3>Recent Applications</h3>
+{% if recent_applications %}
+<table>
+    <thead>
+        <tr>
+            <th>Company</th>
+            <th>Job Title</th>
+            <th>Applied Date</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for application in recent_applications %}
+        <tr>
+            <td>{{ application.company_name }}</td>
+            <td>{{ application.job_title }}</td>
+            <td>{{ application.applied_date }}</td>
+            <td>{{ application.get_status_display }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No applications yet. <a href="{% url 'application_add' %}">Add your first one!</a></p>
+{% endif %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+    const chartData = JSON.parse('{{ chart_data|escapejs }}');
+    const ctx = document.getElementById('statusChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: chartData.labels,
+            datasets: [{
+                data: chartData.values,
+                backgroundColor: ['#2563eb', '#f59e0b', '#ef4444', '#10b981']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+</script>
+{% endblock %}
