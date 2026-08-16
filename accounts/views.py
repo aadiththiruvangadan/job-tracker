@@ -1,7 +1,10 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from .forms import RegisterForm
+from django.contrib import messages
+from django.utils import timezone
+from .forms import RegisterForm, ResumeUploadForm
+from .models import Profile
 
 
 def register_view(request):
@@ -19,4 +22,20 @@ def register_view(request):
 
 @login_required
 def profile_view(request):
-    return render(request, 'accounts/profile.html')
+    profile, created = Profile.objects.get_or_create(user=request.user)
+
+    if request.method == 'POST':
+        form = ResumeUploadForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            profile = form.save(commit=False)
+            profile.resume_uploaded_at = timezone.now()
+            profile.save()
+            messages.success(request, 'Resume uploaded successfully.')
+            return redirect('profile')
+    else:
+        form = ResumeUploadForm(instance=profile)
+
+    return render(request, 'accounts/profile.html', {
+        'form': form,
+        'profile': profile,
+    })

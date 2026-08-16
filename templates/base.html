@@ -15,6 +15,7 @@
             <a href="{% url 'dashboard_home' %}">Dashboard</a>
             <a href="{% url 'application_list' %}">My Applications</a>
             <a href="{% url 'application_add' %}">Add Application</a>
+            <a href="{% url 'job_list' %}">Job Finder</a>
             <a href="{% url 'profile' %}">Profile</a>
             <form method="POST" action="{% url 'logout' %}">
                 {% csrf_token %}
