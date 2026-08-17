@@ -20,6 +20,7 @@ def register_view(request):
         form = RegisterForm()
     return render(request, 'accounts/register.html', {'form': form})
 
+
 @login_required
 def profile_view(request):
     profile, created = Profile.objects.get_or_create(user=request.user)
