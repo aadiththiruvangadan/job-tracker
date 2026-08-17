@@ -19,7 +19,7 @@ def job_list(request):
         )
 
     if tag:
-        jobs = jobs.filter(tags__icontains=tag)
+        jobs = jobs.filter(description__icontains=tag)
 
     paginator = Paginator(jobs, 20)
     page_number = request.GET.get('page')
