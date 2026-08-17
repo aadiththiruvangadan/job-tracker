@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Job Finder{% endblock %}
+
+{% block content %}
+<h2>Job Finder</h2>
+<p>Software &amp; tech jobs, scraped from Internshala   .</p>
+
+<form method="GET" action="{% url 'job_list' %}">
+    <input type="text" name="q" placeholder="Search by title or company" value="{{ query }}">
+    <input type="text" name="tag" placeholder="Filter by tag (e.g. python, react)" value="{{ tag }}">
+    <button type="submit">Search</button>
+    <a href="{% url 'job_list' %}">Clear</a>
+</form>
+
+{% if page_obj %}
+<table>
+    <thead>
+        <tr>
+            <th>Company</th>
+            <th>Job Title</th>
+            <th>Location</th>
+            <!-- <th>Tags</th> -->
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for job in page_obj %}
+        <tr>
+            <td>{{ job.company_name }}</td>
+            <td>{{ job.job_title }}</td>
+            <td>{{ job.location|default:"-" }}</td>
+            <!-- <td>{{ job.tags }}</td> -->
+            <td>
+                <a href="{{ job.apply_link }}" target="_blank">Apply</a> |
+                <form method="POST" action="{% url 'job_bookmark_toggle' job.pk %}" style="display:inline">
+                    {% csrf_token %}
+                    {% if job.pk in bookmarked_ids %}
+                        <button type="submit">Remove Bookmark</button>
+                    {% else %}
+                        <button type="submit">Save Job</button>
+                    {% endif %}
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div>
+    {% if page_obj.has_previous %}
+        <a href="?q={{ query }}&tag={{ tag }}&page=1">First</a>
+        <a href="?q={{ query }}&tag={{ tag }}&page={{ page_obj.previous_page_number }}">Previous</a>
+    {% endif %}
+    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+        <a href="?q={{ query }}&tag={{ tag }}&page={{ page_obj.next_page_number }}">Next</a>
+        <a href="?q={{ query }}&tag={{ tag }}&page={{ page_obj.paginator.num_pages }}">Last</a>
+    {% endif %}
+</div>
+
+{% else %}
+    <p>No jobs found. Run <code>python manage.py scrape_jobs</code> to fetch listings.</p>
+{% endif %}
+{% endblock %}
